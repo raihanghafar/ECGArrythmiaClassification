@@ -1,0 +1,7 @@
+<!-- res/values/strings.xml -->
+<resources>
+    <string name="app_name">ECG Classifier</string>
+    <string name="app_description">Offline ECG Arrhythmia Classification using CWT and TensorFlow Lite</string>
+    <string name="main_description">Upload MIT-BIH CSV file to classify ECG signals. All processing done locally on your device.</string>
+    <string name="privacy_note">🔒 100% Offline and Private - Your data never leaves your device</string>
+</resources>
