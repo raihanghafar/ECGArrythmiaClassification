@@ -83,7 +83,6 @@ class ECGViewModel(application: Application) : AndroidViewModel(application) {
         output: ClassificationOutput,
         metrics: PerformanceMetrics
     ): ClassificationResult {
-
         val predictions = output.predictions
         val confidences = output.confidences
 
@@ -106,6 +105,8 @@ class ECGViewModel(application: Application) : AndroidViewModel(application) {
 
         val averageConfidence = confidences.average().toFloat()
         val fileName = getFileName(uri)
+        val fileSize = getFileSize(uri)
+        val formattedInferenceTime = formatInferenceTime(metrics.inferenceTimeMs)
 
         return ClassificationResult(
             fileName = fileName,
@@ -120,8 +121,33 @@ class ECGViewModel(application: Application) : AndroidViewModel(application) {
             inferenceTimeMs = metrics.inferenceTimeMs,
             cpuUsagePercent = metrics.cpuUsagePercent,
             memoryUsageMB = metrics.memoryUsageMB,
-            rawPredictions = Gson().toJson(predictions)
+            rawPredictions = Gson().toJson(predictions),
+            fileSize = fileSize,
+            formattedInferenceTime = formattedInferenceTime
         )
+    }
+
+    private fun getFileSize(uri: Uri): Long {
+        val cursor = getApplication<Application>().contentResolver.query(uri, null, null, null, null)
+        return cursor?.use {
+            val sizeIndex = it.getColumnIndex(OpenableColumns.SIZE)
+            it.moveToFirst()
+            it.getLong(sizeIndex)
+        } ?: 0L
+    }
+
+    private fun formatInferenceTime(ms: Long): String {
+        return when {
+            ms >= 60_000 -> {
+                val minutes = ms / 60_000
+                val seconds = (ms % 60_000) / 1000.0
+                String.format("%d min %.1f s", minutes, seconds)
+            }
+            ms >= 1000 -> {
+                String.format("%.2f s", ms / 1000.0)
+            }
+            else -> "$ms ms"
+        }
     }
 
     private fun getFileName(uri: Uri): String {

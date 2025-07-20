@@ -38,7 +38,7 @@ class ECGPreprocessor {
     private val samplingRate = 360.0
     private val tolerance = 0.05
 
-    fun preprocessECGData(ecgData: ECGData): PreprocessedData {
+    suspend fun preprocessECGData(ecgData: ECGData): PreprocessedData {
         // Use primary signal instead of mliiSignal
         val signal = ecgData.primarySignal
 
@@ -52,7 +52,7 @@ class ECGPreprocessor {
         val alignedRPeaks = alignRPeaks(denoisedSignal, rPeaks)
         val normalizedSignal = normalizeSignal(denoisedSignal, alignedRPeaks)
 
-        val scalograms = waveletTransform.continuousWaveletTransformTest(
+        val scalograms = waveletTransform.continuousWaveletTransform(
             normalizedSignal, alignedRPeaks
         )
 

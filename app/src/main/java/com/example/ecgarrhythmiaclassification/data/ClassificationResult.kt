@@ -20,5 +20,7 @@ data class ClassificationResult(
     val inferenceTimeMs: Long,
     val cpuUsagePercent: Float,
     val memoryUsageMB: Float,
-    val rawPredictions: String
+    val rawPredictions: String,
+    val fileSize: Long, // in bytes
+    val formattedInferenceTime: String // e.g. "1 min 12.3 s" or "950 ms"
 ) : Serializable

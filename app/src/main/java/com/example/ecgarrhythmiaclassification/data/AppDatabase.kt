@@ -5,7 +5,7 @@ import androidx.room.*
 
 @Database(
     entities = [ClassificationResult::class],
-    version = 1,
+    version = 2, // incremented from 1 to 2
     exportSchema = false
 )
 @TypeConverters(Converters::class)
@@ -22,7 +22,10 @@ abstract class AppDatabase : RoomDatabase() {
                     context.applicationContext,
                     AppDatabase::class.java,
                     "ecg_database"
-                ).build()
+                )
+                    // Add a fallback for destructive migration for simplicity
+                    .fallbackToDestructiveMigration()
+                    .build()
                 INSTANCE = instance
                 instance
             }

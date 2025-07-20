@@ -22,6 +22,8 @@ import com.example.ecgarrhythmiaclassification.ui.theme.ECGArrhythmiaClassificat
 import com.example.ecgarrhythmiaclassification.data.ClassificationResult
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.times
+import kotlin.toString
 
 class ResultActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -134,6 +136,7 @@ fun FileInfoCard(result: ClassificationResult) {
             Spacer(modifier = Modifier.height(12.dp))
 
             InfoRow(label = "File Name", value = result.fileName)
+            InfoRow(label = "File Size", value = formatFileSize(result.fileSize))
             InfoRow(label = "Processed At", value = formatTimestamp(result.timestamp))
             InfoRow(label = "Total Beats", value = result.totalBeats.toString())
             InfoRow(
@@ -255,7 +258,7 @@ fun PerformanceMetricsCard(result: ClassificationResult) {
 
             InfoRow(
                 label = "Inference Time",
-                value = "${result.inferenceTimeMs} ms"
+                value = result.formattedInferenceTime
             )
             InfoRow(
                 label = "Memory Usage",
@@ -295,4 +298,15 @@ fun InfoRow(label: String, value: String) {
 fun formatTimestamp(timestamp: Long): String {
     val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm:ss", Locale.getDefault())
     return sdf.format(Date(timestamp))
+}
+
+// Utility to format file size
+fun formatFileSize(bytes: Long): String {
+    val kb = 1024
+    val mb = kb * 1024
+    return when {
+        bytes >= mb -> String.format("%.2f MB", bytes.toDouble() / mb)
+        bytes >= kb -> String.format("%.2f KB", bytes.toDouble() / kb)
+        else -> "$bytes B"
+    }
 }
