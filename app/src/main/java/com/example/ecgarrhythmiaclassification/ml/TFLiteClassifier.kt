@@ -7,6 +7,7 @@ import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
+import kotlin.text.get
 
 data class ClassificationOutput(
     val predictions: Array<FloatArray>,
@@ -95,6 +96,23 @@ class TFLiteClassifier(private val context: Context) {
         }
 
         Log.i("TFLiteClassifier", "Classification completed for ${results.size} heartbeats")
+
+        val labelCount = 5
+        val sumConfidences = FloatArray(labelCount) { 0f }
+        val countPerLabel = IntArray(labelCount) { 0 }
+
+        for (i in results.indices) {
+            val prediction = results[i]
+            val confidence = confidences[i]
+            val maxIndex = prediction.indices.maxByOrNull { prediction[it] } ?: 0
+            sumConfidences[maxIndex] += confidence
+            countPerLabel[maxIndex] += 1
+        }
+
+        for (i in 0 until labelCount) {
+            val avg = if (countPerLabel[i] > 0) sumConfidences[i] / countPerLabel[i] else 0f
+            Log.i("TFLiteClassifier", "Average confidence for label $i: ${String.format("%.3f", avg)}")
+        }
 
         return ClassificationOutput(
             predictions = results.toTypedArray(),
